@@ -5685,10 +5685,6 @@
       clearTimeout(this._timeout);
       EventHandler.off(this._element.closest(SELECTOR_MODAL), EVENT_MODAL_HIDE, this._hideModalHandler);
 
-      if (this.tip) {
-        this.tip.remove();
-      }
-
       if (this._element.getAttribute('data-bs-original-title')) {
         this._element.setAttribute('title', this._element.getAttribute('data-bs-original-title'));
       }
@@ -5717,10 +5713,7 @@
       } // todo v6 remove this OR make it optional
 
 
-      if (this.tip) {
-        this.tip.remove();
-        this.tip = null;
-      }
+      this._disposePopper();
 
       const tip = this._getTipElement();
 
@@ -5735,12 +5728,7 @@
         EventHandler.trigger(this._element, this.constructor.eventName(EVENT_INSERTED));
       }
 
-      if (this._popper) {
-        this._popper.update();
-      } else {
-        this._popper = this._createPopper(tip);
-      }
-
+      this._popper = this._createPopper(tip);
       tip.classList.add(CLASS_NAME_SHOW$2); // If this is a touch-enabled device we add extra
       // empty mouseover listeners to the body's immediate children;
       // only needed because of broken event delegation on iOS
@@ -5798,14 +5786,12 @@
         }
 
         if (!this._isHovered) {
-          tip.remove();
+          this._disposePopper();
         }
 
         this._element.removeAttribute('aria-describedby');
 
         EventHandler.trigger(this._element, this.constructor.eventName(EVENT_HIDDEN$2));
-
-        this._disposePopper();
       };
 
       this._queueCallback(complete, this.tip, this._isAnimated());
@@ -6121,6 +6107,11 @@
         this._popper.destroy();
 
         this._popper = null;
+      }
+
+      if (this.tip) {
+        this.tip.remove();
+        this.tip = null;
       }
     } // Static
 
